@@ -42,5 +42,8 @@ int filter(char *filter_filename, char *input_wavefilename, char *output_wavefil
 		return -1;
 	}
 	printf("Done.\n");
+
+//	free(coeff_values);
+//	free(data);
 	return 0;
 }

@@ -41,6 +41,12 @@ int filter(char *filter_filename, char *input_wavefilename, char *output_wavefil
 		printf("Error: Could not write to file.\n");
 		return -1;
 	}
+
+	free(coeff_values);
+	free(data);
+	free(new_data);
+
+
 	printf("Done.\n");
 
 //	free(coeff_values);

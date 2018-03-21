@@ -22,18 +22,23 @@ int filter(char *filter_filename, char *input_wavefilename, char *output_wavefil
 	}
 
 	printf("Filter the input...\n");
-	char *new_data = (char*)malloc((size_t)(sizeof(char) * header.Subchunk2Size));	// allocating memory for the new data
-	for (int k = 0; k < header.Subchunk2Size; k++){		// for every byte in the data file
-		new_data[k] = 0;	// clearing junk out of memory just in case
+
+	short *data16 = (short*)data;
+	short *new_data16 = (short*)malloc((size_t)(sizeof(short) * header.Subchunk2Size));	// allocating memory for the new data
+	for (int k = 0; k < header.Subchunk2Size/2; k++){		// for every byte in the data file
+		new_data16[k] = 0;	// clearing junk out of memory just in case
 		for (int n = 0; n < coeff_num; n++){			// for each coefficient
 			if (k-n < 0){		// if byte is out of bounds
-				new_data[k] += 0;
+				new_data16[k] += 0;
 			}
 			else{				// else apply filter
-				new_data[k] += data[k-n] * coeff_values[n];
+				new_data16[k] += (data16[k-n] * coeff_values[n]);
 			}
 		}
 	}
+	char *new_data = (char*)new_data16;
+
+
 	printf("Done.\n");
 
 	printf("Write output wavefile %s...\n", output_wavefilename);

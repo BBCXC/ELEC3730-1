@@ -35,7 +35,7 @@ int read_coefficients(int *coeff_num_p, double **coeff_values_p, char *filename)
 
 	printf("File name:\t%s\n", filename);		// start printing the report
 	printf("Array size:\t%d\n", *coeff_num_p);
-	for (int i = 0; i < *coeff_num_p; i+=3){
+	for (int i = 0; i < *coeff_num_p; i+=COLUMNS){
 		for (int col = 0; col < COLUMNS; col++){// format the data based on the COLUMNS constant
 			if (i+col < *coeff_num_p){
 				printf("%.3lf ", (*coeff_values_p)[i+col]);

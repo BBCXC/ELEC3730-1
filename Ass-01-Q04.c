@@ -23,11 +23,9 @@ int string_parser(char *inp, char **array_of_words_p[])
 		else if (pinp_it > 0){
 			pinp_it--;
 		}
-		if (inp[i+1] == '\0'){
-			pinp[pinp_it] = '\0';
-		}
 		printf("inp[i]: %c pinp[j]: %c\n", inp[i], pinp[pinp_it]);
 	}
+	pinp[pinp_it] = '\0';
 
 	printf("PINP = %s\n", pinp);
 

@@ -7,9 +7,20 @@
 #include "usart.h"
 #endif
 
+#define COMMAND_COUNT 4
+
 //
 // REPLACE THE EXAMPLE CODE WITH YOUR CODE
 //
+
+int debug = 0;
+
+typedef struct {
+	uint8_t* name;
+	uint8_t length;
+	uint8_t (*Function_p)(uint8_t argc, uint8_t* argv);
+	uint8_t* help;
+} command;
 
 int string_parser(uint8_t *inp, uint8_t **array_of_words_p[]){
 
@@ -123,13 +134,23 @@ int validate_args(int args_count, uint8_t** args){
 	return 1;
 }
 
+//returns the number of characters different in the two strings
+int str_compare(uint8_t strLength, uint8_t* str1, uint8_t* str2){
+	int count = 0;
+	for (int i = 0; i < strLength; i++){
+		if (str1[i] != str2[i]){
+			count++;
+		}
+	}
+	return count;
+}
+
 void add_numbers(int args_count, uint8_t** args){
 	printf("Entering add_numbers\n");
 	float result = 0;
 	int error = 0;
 	for (int i = 1; i < args_count; i++){
 		result += atof(args[i]);
-		error = 1;
 	}
 	if (!error){
 		printf("Result : %.2f", result);
@@ -173,12 +194,62 @@ void div_numbers(int args_count, uint8_t** args){
 		printf("Result : %.2f", result);
 	}
 }
+
+void debug_function(){
+	debug = (debug+1)%2;
+	if (debug == 0){
+		printf("debug toggled off");
+	}
+	else {
+		printf("debug toggled off");
+	}
+}
+
 void CommandLineParserInit(void)
 {
 	// Print welcome message
 	printf("\014");
 	printf("ELEC3730 Assignment 2\n");
 	printf("Command Line Parser Example\n");
+}
+
+const command commandlist[] = {
+	{ "add", 4, &add_numbers, "add <num1> .. <numN> : Prints the sum of the numbers\n" },
+	{ "sub", 4, &sub_numbers, "sub <num1> <num2> : Prints the result of num1-num2\n" },
+	{ "mul", 4, &mul_numbers, "mul <num1> .. <numN> : Prints the product of the numbers\n" },
+	{ "div", 4, &div_numbers, "div <num1> <num2> : Prints the result of num_1 / num_2\n" },
+	{ NULL, NULL, NULL, NULL }
+};
+
+void help_function(uint8_t argc, uint8_t** args){
+	printf("help required you are seeking help\n");
+	if (argc == 1){
+		for (int i = 0; i < COMMAND_COUNT; i++){
+			printf("%s", commandlist[i].help);
+		}
+		printf("debug <on|off> : Turns debug messages on or off\n");
+		printf("help [command] : Prints help information for command\n");
+	}
+	else{
+		int argFound = 0;
+		for (int i = 0; i < COMMAND_COUNT && argFound == 0; i++){
+			if (str_compare(commandlist[i].length, commandlist[i].name, args[1]) == 0){
+				argFound = 1;
+				printf("%s", commandlist[i].help);
+			}
+		}
+		if (argFound == 0){
+			if (str_compare(5, "help", args[1]) == 0){
+				printf("help [command] : Prints help information for command\n");
+			}
+			else if (str_compare(6, "debug", args[1]) == 0){
+				printf("debug <on|off> : Turns debug messages on or off\n");
+			}
+			else{
+				printf("Unknown command : %s\n", args[1]);
+			}
+		}
+	}
 }
 
 void CommandLineParserProcess(void)
@@ -232,110 +303,33 @@ void CommandLineParserProcess(void)
 	int wordcount = string_parser(string, &args);
 
 	for (int i = 0; i < wordcount; i++){
-//		printf("word %d: %s.\n", i, args[i]);
+		printf("word %d: %s.\n", i, args[i]);
 	}
 
-	if (		args[0][0] == 'a' &&
-				args[0][1] == 'd' &&
-				args[0][2] == 'd' &&
-				args[0][3] == '\0'){
-		if (validate_args(wordcount, args)){
-			add_numbers(wordcount, args);
-		}
-	}
-	else if (	args[0][0] == 's' &&
-				args[0][1] == 'u' &&
-				args[0][2] == 'b' &&
-				args[0][3] == '\0'){
-		if (validate_args(wordcount, args)){
-			sub_numbers(wordcount, args);
-		}
-	}
-	else if (	args[0][0] == 'm' &&
-				args[0][1] == 'u' &&
-				args[0][2] == 'l' &&
-				args[0][3] == '\0'){
-		if (validate_args(wordcount, args)){
-			mul_numbers(wordcount, args);
-		}
-	}
-	else if (	args[0][0] == 'd' &&
-				args[0][1] == 'i' &&
-				args[0][2] == 'v' &&
-				args[0][3] == '\0'){
-		if (validate_args(wordcount, args)){
-			div_numbers(wordcount, args);
-		}
-	}
-	else if (	args[0][0] == 'd' &&
-				args[0][1] == 'e' &&
-				args[0][2] == 'b' &&
-				args[0][3] == 'u' &&
-				args[0][4] == 'g' &&
-				args[0][5] == '\0'){
-		// TODO DEBUG
-	}
-	else if (	args[0][0] == 'h' &&
-				args[0][1] == 'e' &&
-				args[0][2] == 'l' &&
-				args[0][3] == 'p' &&
-				args[0][4] == '\0'){
-		if (wordcount > 1){
+	printf("compare: %d\n", str_compare(4, commandlist[0].name, args[0]));
 
-			if (		args[1][0] == 'h' &&
-						args[1][1] == 'e' &&
-						args[1][2] == 'l' &&
-						args[1][3] == 'p' &&
-						args[1][4] == '\0'){
-				printf("help [command] : Prints help information for command\n");
-			}
-			else if (	args[1][0] == 'a' &&
-						args[1][1] == 'd' &&
-						args[1][2] == 'd' &&
-						args[1][3] == '\0'){
-				printf("add <num1> .. <numN> : Prints the sum of the numbers\n");
-			}
-			else if (	args[1][0] == 's' &&
-						args[1][1] == 'u' &&
-						args[1][2] == 'b' &&
-						args[1][3] == '\0'){
-				printf("sub <num1> <num2> : Prints the result of num1-num2\n");
-			}
-			else if (	args[1][0] == 'm' &&
-						args[1][1] == 'u' &&
-						args[1][2] == 'l' &&
-						args[1][3] == '\0'){
-				printf("mul <num1> .. <numN> : Prints the product of the numbers\n");
-			}
-			else if (	args[1][0] == 'd' &&
-						args[1][1] == 'i' &&
-						args[1][2] == 'v' &&
-						args[1][3] == '\0'){
-				printf("div <num1> <num2> : Prints the result of num_1 / num_2\n");
-			}
-			else if (	args[1][0] == 'd' &&
-						args[1][1] == 'e' &&
-						args[1][2] == 'b' &&
-						args[1][3] == 'u' &&
-						args[1][4] == 'g' &&
-						args[1][5] == '\0'){
-				printf("debug <on|off> : Turns debug messages on or off\n");
+	int argFound = 0;
+	for (int i = 0; i < COMMAND_COUNT && argFound == 0; i++){
+		if (str_compare(commandlist[i].length, commandlist[i].name, args[0]) == 0){
+			argFound = 1;
+			if (validate_args(wordcount, args) == 1){
+				commandlist[i].Function_p(wordcount, args);
 			}
 			else{
-				printf("Unknown help command: %s", args[1]);
+				printf("NAN");
 			}
 		}
-		else {
-			printf("add <num1> .. <numN> : Prints the sum of the numbers\n");
-			printf("sub <num1> <num2> : Prints the result of num1-num2\n");
-			printf("mul <num1> .. <numN> : Prints the product of the numbers\n");
-			printf("div <num1> <num2> : Prints the result of num_1 / num_2\n");
-			printf("debug <on|off> : Turns debug messages on or off\n");
-			printf("help [command] : Prints help information for command\n");
-		}
 	}
-	else{
-		printf("Unknown command: %s\n", args[0]);
+	if (argFound == 0){
+		if (str_compare(5, "help", args[0]) == 0){
+			help_function(wordcount, args);
+		}
+		else if (str_compare(6, "debug", args[0]) == 0){
+			debug_function();
+		}
+		else{
+			printf("Unknown command: %s\n", args[0]);
+		}
 	}
 
 #endif

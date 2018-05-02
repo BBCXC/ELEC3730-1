@@ -1,7 +1,7 @@
 //     $Date: 2018-03-26 08:32:18 +1100 (Mon, 26 Mar 2018) $
 // $Revision: 1217 $
 //   $Author: Peter $
-
+#include "Q1.h"
 #include "Ass-02.h"
 #ifdef STM32F407xx
 #include "usart.h"
@@ -15,12 +15,6 @@
 
 int debug = 0;
 
-typedef struct {
-	uint8_t* name;
-	uint8_t length;
-	uint8_t (*Function_p)(uint8_t argc, uint8_t* argv);
-	uint8_t* help;
-} command;
 
 int string_parser(uint8_t *inp, uint8_t **array_of_words_p[]){
 
@@ -197,10 +191,12 @@ void div_numbers(int args_count, uint8_t** args){
 
 void debug_function(){
 	debug = (debug+1)%2;
-	if (debug == 0){
+	if (debugtoggle == 0){
+		debugtoggle = 1;
 		printf("debug toggled off");
 	}
 	else {
+		debugtoggle = 0;
 		printf("debug toggled off");
 	}
 }
@@ -213,6 +209,16 @@ void CommandLineParserInit(void)
 	printf("Command Line Parser Example\n");
 }
 
+#ifndef MECOMMANDLIST
+#define MECOMMANDLIST
+const command commandlist[] = {
+		{ "add", 4, &add_numbers, "add <num1> .. <numN> : Prints the sum of the numbers\n" },
+		{ "sub", 4, &sub_numbers, "sub <num1> <num2> : Prints the result of num1-num2\n" },
+		{ "mul", 4, &mul_numbers, "mul <num1> .. <numN> : Prints the product of the numbers\n" },
+		{ "div", 4, &div_numbers, "div <num1> <num2> : Prints the result of num_1 / num_2\n" },
+		{ NULL, NULL, NULL, NULL }
+};
+#endif
 const command commandlist[] = {
 	{ "add", 4, &add_numbers, "add <num1> .. <numN> : Prints the sum of the numbers\n" },
 	{ "sub", 4, &sub_numbers, "sub <num1> <num2> : Prints the result of num1-num2\n" },

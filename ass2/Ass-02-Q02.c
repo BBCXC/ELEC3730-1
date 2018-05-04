@@ -436,68 +436,61 @@ void CalculatorProcess(void)
 	char* debugmsg = (char*)malloc(sizeof(char)*100);
 	// STEPIEN: Assume horizontal display
 
-	uint16_t max_length = 20;
-	uint16_t exp_length = 0;
-	uint8_t* expression = (uint8_t*) malloc(8 * max_length);
+	static uint16_t max_length = 20;
+	static uint16_t exp_length = 0;
+	static uint8_t* expression = (uint8_t*) malloc(8 * max_length);
 	static uint8_t bounceUp = 0;
 	static uint8_t bounceDown = 0;
-	while (1){
-		sprintf(debugmsg, "new expression\n");
-		dout(debugmsg);
-		uint8_t pressed = 0;
-		while (1){
-			// getDisplayPoint(&display, Read_Ads7846(), &matrix );
-			uint8_t last_char = ' ';
-			if (BSP_TP_GetDisplayPoint(&display) == 0 && pressed == 0){
-				bounceDown++;
-				if (bounceDown == 35){
-					pressed = 1;
-					bounceDown = 0;
-					for (int i = 0; i < NUM_OF_BUTTONS; i++){
-						if (rect_collision(buttons[i].border, display.x, display.y)){
-							sprintf(debugmsg, "button pressed at: %d %d : %c\n", display.x, display.y, buttons[i].command);
-							dout(debugmsg);
-							expression[exp_length] = buttons[i].command;
-							expression[exp_length+1] = '\0';
-							sprintf(debugmsg, "expression: %s\n", expression);
-							BSP_LCD_DisplayStringAt(20, 20, "", LEFT_MODE);
-							BSP_LCD_DisplayStringAt(20, 20, expression, LEFT_MODE);
-							dout(debugmsg);
-							last_char = expression[exp_length];
-							exp_length++;
-						}
-					}
+	static uint8_t pressed = 0;
+	// getDisplayPoint(&display, Read_Ads7846(), &matrix );
+	uint8_t last_char = ' ';
+	if (BSP_TP_GetDisplayPoint(&display) == 0 && pressed == 0){
+		bounceDown++;
+		if (bounceDown == 35){
+			pressed = 1;
+			bounceDown = 0;
+			for (int i = 0; i < NUM_OF_BUTTONS; i++){
+				if (rect_collision(buttons[i].border, display.x, display.y)){
+					sprintf(debugmsg, "button pressed at: %d %d : %c\n", display.x, display.y, buttons[i].command);
+					dout(debugmsg);
+					expression[exp_length] = buttons[i].command;
+					expression[exp_length+1] = '\0';
+					sprintf(debugmsg, "expression: %s\n", expression);
+					BSP_LCD_DisplayStringAt(20, 20, "", LEFT_MODE);
+					BSP_LCD_DisplayStringAt(20, 20, expression, LEFT_MODE);
+					dout(debugmsg);
+					last_char = expression[exp_length];
+					exp_length++;
 				}
-			}
-			else if (BSP_TP_GetDisplayPoint(&display) == 1 && pressed == 1){
-				bounceUp++;
-				if (bounceUp == 35){
-					bounceUp = 0;
-					pressed = 0;
-				}
-			}
-			if (exp_length + 2 > max_length){
-				sprintf(debugmsg, "doubling expression length");
-				dout(debugmsg);
-				max_length *= 2;
-				expression = (uint8_t*) realloc(expression, 8 * max_length);
-			}
-			if (last_char == 'c'){
-				sprintf(debugmsg, "clearing expression");
-				dout(debugmsg);
-				max_length = 20;
-				exp_length = 0;
-				expression = (uint8_t*) malloc(8 * max_length);
-				expression[0] = '\0';
-				BSP_LCD_DisplayStringAt(20, 20, "                                        ", LEFT_MODE);
-			}
-			else if (last_char == '='){
-				sprintf(debugmsg, "equals sign found!!!");
-				dout(debugmsg);
-				expression[exp_length+1] = '\0';
-				break;
 			}
 		}
+	}
+	else if (BSP_TP_GetDisplayPoint(&display) == 1 && pressed == 1){
+		bounceUp++;
+		if (bounceUp == 35){
+			bounceUp = 0;
+			pressed = 0;
+		}
+	}
+	if (exp_length + 2 > max_length){
+		sprintf(debugmsg, "doubling expression length");
+		dout(debugmsg);
+		max_length *= 2;
+		expression = (uint8_t*) realloc(expression, 8 * max_length);
+	}
+	if (last_char == 'c'){
+		sprintf(debugmsg, "clearing expression");
+		dout(debugmsg);
+		max_length = 20;
+		exp_length = 0;
+		expression = (uint8_t*) malloc(8 * max_length);
+		expression[0] = '\0';
+		BSP_LCD_DisplayStringAt(20, 20, "                                        ", LEFT_MODE);
+	}
+	else if (last_char == '='){
+		sprintf(debugmsg, "equals sign found!!!");
+		dout(debugmsg);
+		expression[exp_length+1] = '\0';
 		sprintf(debugmsg, "loop broken\nexpression: %s\n", expression);
 		dout(debugmsg);
 		int arg_count = 0;

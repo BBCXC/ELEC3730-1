@@ -2,8 +2,7 @@
 // $Revision: 1217 $
 //   $Author: Peter $
 
-#include "Ass-02.h"
-
+#include "Q1.h"
 #define WIDTH 55
 #define XBUTTONS 5
 #define HEIGHT 40
@@ -11,12 +10,17 @@
 #define XMARGIN (320-(XBUTTONS*WIDTH))/(XBUTTONS+1)
 #define YMARGIN (240-(YBUTTONS*HEIGHT))/(YBUTTONS+1)
 #define NUM_OF_BUTTONS (XBUTTONS*(YBUTTONS-1))
-uint8_t error=0;
 
 //
 // REPLACE THE EXAMPLE CODE WITH YOUR CODE 
 //
 
+int debugtoggle = 1;
+int error = 0;
+uint8_t* expression;
+
+#ifndef MESTRUCT
+#define MESTRUCT
 typedef struct{
 	uint8_t x;
 	uint8_t y;
@@ -35,6 +39,7 @@ typedef struct{
 	double symnum;
 	int is_symbol;
 } Symnum;
+#endif
 
 void dout(const char* str){
 	if (debugtoggle){
@@ -181,6 +186,7 @@ Symnum* parse_expression(uint8_t exp_length, uint8_t* exp, int* argcout){
 
 	*argcout = num_args;
 	return exp_array;
+	free(debugmsg);
 }
 
 Symnum eval_expression(uint8_t argc, Symnum* args){
@@ -380,31 +386,31 @@ Symnum eval_expression(uint8_t argc, Symnum* args){
 		args = newargs;
 	}
 	Symnum ans = {args[0].symnum, 0};
+	free(debugmsg);
 	return ans;
 }
 
 const Button buttons[] = {
-
 		{"7",	'7',	{(XMARGIN+ 0 *(XMARGIN+WIDTH)), (YMARGIN+ 1 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 0 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 1 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"8",	'8',	{(XMARGIN+ 1 *(XMARGIN+WIDTH)), (YMARGIN+ 1 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 1 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 1 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"9",	'9',	{(XMARGIN+ 2 *(XMARGIN+WIDTH)), (YMARGIN+ 1 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 2 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 1 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"(",	'(',	{(XMARGIN+ 3 *(XMARGIN+WIDTH)), (YMARGIN+ 1 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 3 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 1 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
-		{"",	')',	{(XMARGIN+ 4 *(XMARGIN+WIDTH)), (YMARGIN+ 1 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 4 *(XMARGIN+WIDTH))+(WIDTH/2)+ 200 , (YMARGIN+ 1 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
+		{"",	')',	{(XMARGIN+ 4 *(XMARGIN+WIDTH)), (YMARGIN+ 1 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 4 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 1 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"4",	'4',	{(XMARGIN+ 0 *(XMARGIN+WIDTH)), (YMARGIN+ 2 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 0 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 2 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"5",	'5',	{(XMARGIN+ 1 *(XMARGIN+WIDTH)), (YMARGIN+ 2 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 1 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 2 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"6",	'6',	{(XMARGIN+ 2 *(XMARGIN+WIDTH)), (YMARGIN+ 2 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 2 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 2 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"/",	'/',	{(XMARGIN+ 3 *(XMARGIN+WIDTH)), (YMARGIN+ 2 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 3 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 2 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
-		{"",	'*',	{(XMARGIN+ 4 *(XMARGIN+WIDTH)), (YMARGIN+ 2 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 4 *(XMARGIN+WIDTH))+(WIDTH/2)+ 220 , (YMARGIN+ 2 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
+		{"",	'*',	{(XMARGIN+ 4 *(XMARGIN+WIDTH)), (YMARGIN+ 2 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 4 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 2 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"1",	'1',	{(XMARGIN+ 0 *(XMARGIN+WIDTH)), (YMARGIN+ 3 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 0 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 3 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"2",	'2',	{(XMARGIN+ 1 *(XMARGIN+WIDTH)), (YMARGIN+ 3 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 1 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 3 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"3",	'3',	{(XMARGIN+ 2 *(XMARGIN+WIDTH)), (YMARGIN+ 3 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 2 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 3 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"-",	'-',	{(XMARGIN+ 3 *(XMARGIN+WIDTH)), (YMARGIN+ 3 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 3 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 3 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
-		{"",	'+',	{(XMARGIN+ 4 *(XMARGIN+WIDTH)), (YMARGIN+ 3 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 4 *(XMARGIN+WIDTH))+(WIDTH/2)+ 240 , (YMARGIN+ 3 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
+		{"",	'+',	{(XMARGIN+ 4 *(XMARGIN+WIDTH)), (YMARGIN+ 3 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 4 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 3 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"0",	'0',	{(XMARGIN+ 0 *(XMARGIN+WIDTH)), (YMARGIN+ 4 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 0 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 4 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{".",	'.',	{(XMARGIN+ 1 *(XMARGIN+WIDTH)), (YMARGIN+ 4 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 1 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 4 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{" ",	' ',	{(XMARGIN+ 2 *(XMARGIN+WIDTH)), (YMARGIN+ 4 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 2 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 4 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
 		{"c",	'c',	{(XMARGIN+ 3 *(XMARGIN+WIDTH)), (YMARGIN+ 4 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 3 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 4 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}},
-		{"",	'=',	{(XMARGIN+ 4 *(XMARGIN+WIDTH)), (YMARGIN+ 4 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(275) , (YMARGIN+ 4 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}}
+		{"",	'=',	{(XMARGIN+ 4 *(XMARGIN+WIDTH)), (YMARGIN+ 4 *(YMARGIN+HEIGHT)), WIDTH, HEIGHT}, {(XMARGIN+ 4 *(XMARGIN+WIDTH))+(WIDTH/2)+ 0 , (YMARGIN+ 4 *(YMARGIN+HEIGHT))+(HEIGHT/2)+ 0 , 0, 0}}
 };
 void CalculatorInit(void)
 {
@@ -424,44 +430,95 @@ void CalculatorInit(void)
 		draw_button(buttons[i]);
 	}
 	BSP_LCD_DrawRect(XMARGIN, YMARGIN, 320-(2*XMARGIN), HEIGHT);
-}
-
-void CalculatorProcess(void)
-{
+	expression = (uint8_t*) malloc(8 * 20);
 	BSP_LCD_DisplayStringAt(279, 72, ")", LEFT_MODE);
 	BSP_LCD_DisplayStringAt(279, 117, "*", LEFT_MODE);
 	BSP_LCD_DisplayStringAt(279, 163, "+", LEFT_MODE);
 	BSP_LCD_DisplayStringAt(279, 205, "=", LEFT_MODE);
+}
 
+void CalculatorProcess(void)
+{
+//	printf("CALCULATOR PARSER\n");
 	char* debugmsg = (char*)malloc(sizeof(char)*100);
 	// STEPIEN: Assume horizontal display
 
 	static uint16_t max_length = 20;
 	static uint16_t exp_length = 0;
-	static uint8_t* expression = (uint8_t*) malloc(8 * max_length);
 	static uint8_t bounceUp = 0;
 	static uint8_t bounceDown = 0;
 	static uint8_t pressed = 0;
-	// getDisplayPoint(&display, Read_Ads7846(), &matrix );
-	uint8_t last_char = ' ';
+	static uint8_t last_char = ' ';
+
 	if (BSP_TP_GetDisplayPoint(&display) == 0 && pressed == 0){
 		bounceDown++;
 		if (bounceDown == 35){
+			sprintf(debugmsg, "Screen pressed at: %d %d\n", display.x, display.y);
+			dout(debugmsg);
 			pressed = 1;
 			bounceDown = 0;
-			for (int i = 0; i < NUM_OF_BUTTONS; i++){
-				if (rect_collision(buttons[i].border, display.x, display.y)){
+			for (int i = 0; i < NUM_OF_BUTTONS; i++){		// loop through all buttons seeing if one has been pressed
+				if (rect_collision(buttons[i].border, display.x, display.y)){		// if the press collides with a button
 					sprintf(debugmsg, "button pressed at: %d %d : %c\n", display.x, display.y, buttons[i].command);
 					dout(debugmsg);
-					expression[exp_length] = buttons[i].command;
-					expression[exp_length+1] = '\0';
+					expression[exp_length] = buttons[i].command;	// add the buttons command to the end of the expression string
+					expression[exp_length+1] = '\0';				// null terminate the string again
 					sprintf(debugmsg, "expression: %s\n", expression);
-					BSP_LCD_DisplayStringAt(20, 20, "", LEFT_MODE);
+					BSP_LCD_DisplayStringAt(20, 20, "                                        ", LEFT_MODE);		// clear the expression from the screen
+					BSP_LCD_DisplayStringAt(20, 20, expression, LEFT_MODE);	// rewrite the expression
+					dout(debugmsg);
+					last_char = expression[exp_length];		// update last char variable
+					exp_length++;
+					if (exp_length + 2 > max_length){		// if the expression has out grown its array
+						sprintf(debugmsg, "doubling expression length\n");
+						dout(debugmsg);
+						max_length *= 2;					// double length and reallocate
+						expression = (uint8_t*) realloc(expression, 8 * max_length);
+					}
+				}
+			}
+			if (last_char == 'c'){		// if clear command
+				sprintf(debugmsg, "clearing expression");
+				dout(debugmsg);
+				max_length = 20;		// reset all expression counters
+				exp_length = 0;
+				expression = (uint8_t*) malloc(8 * max_length);	// clear the expression
+				expression[0] = '\0';	// null terminate the string
+				BSP_LCD_DisplayStringAt(20, 20, "                                        ", LEFT_MODE);	// clear the screen
+			}
+			else if (last_char == '='){		// if = sign is found
+				sprintf(debugmsg, "equals sign found!!!");
+				dout(debugmsg);
+				expression[exp_length+1] = '\0';	// null terminate the string
+				sprintf(debugmsg, "loop broken\nexpression: %s\n", expression);
+				dout(debugmsg);
+				int arg_count = 0;	// initialise an element count
+				Symnum* exp_args = parse_expression(exp_length-1, expression, &arg_count);	// parse the expression
+				double final_val = eval_expression(arg_count, exp_args).symnum;	// evaluate the expression
+				sprintf(debugmsg, "%lf", final_val);
+
+				if (error!=0 || final_val != final_val){	// check if an error flag has been set
+					sprintf(debugmsg, "Invalid Input");
+					dout(debugmsg);
+					BSP_LCD_DisplayStringAt(20, 20, "Invalid Input", LEFT_MODE);
+					max_length = 20;		// reset expression
+					exp_length = 0;
+					expression = (uint8_t*) malloc(8 * max_length);
+					expression[0] = '\0';
+				}
+				else{	// if valid answer is returned
+					BSP_LCD_DisplayStringAt(20, 20, "                                        ", LEFT_MODE);
+					char* final_val_s = (char*)malloc(sizeof(char*)* 20);
+					sprintf(final_val_s, "%lf", final_val);		// print answer
+					BSP_LCD_DisplayStringAt(20, 20, final_val_s, LEFT_MODE);
+					max_length = 20;	//reset expression
+					exp_length = 0;
+					expression = (uint8_t*) malloc(8 * max_length);
+					expression[0] = '\0';
 					BSP_LCD_DisplayStringAt(20, 20, expression, LEFT_MODE);
 					dout(debugmsg);
-					last_char = expression[exp_length];
-					exp_length++;
 				}
+				error=0;
 			}
 		}
 	}
@@ -472,47 +529,115 @@ void CalculatorProcess(void)
 			pressed = 0;
 		}
 	}
-	if (exp_length + 2 > max_length){
-		sprintf(debugmsg, "doubling expression length");
-		dout(debugmsg);
-		max_length *= 2;
-		expression = (uint8_t*) realloc(expression, 8 * max_length);
-	}
-	if (last_char == 'c'){
-		sprintf(debugmsg, "clearing expression");
-		dout(debugmsg);
-		max_length = 20;
-		exp_length = 0;
-		expression = (uint8_t*) malloc(8 * max_length);
-		expression[0] = '\0';
-		BSP_LCD_DisplayStringAt(20, 20, "                                        ", LEFT_MODE);
-	}
-	else if (last_char == '='){
-		sprintf(debugmsg, "equals sign found!!!");
-		dout(debugmsg);
-		expression[exp_length+1] = '\0';
-		sprintf(debugmsg, "loop broken\nexpression: %s\n", expression);
-		dout(debugmsg);
-		int arg_count = 0;
-		uint8_t* exp_args = parse_expression(exp_length-1, expression, &arg_count);
-		double final_val = eval_expression(arg_count, exp_args).symnum;
-		sprintf(debugmsg, "%lf", final_val);
-
-		if (error!=0 || final_val != final_val){
-			BSP_LCD_DisplayStringAt(20, 20, "Invalid Input", LEFT_MODE);
-		}
-		else{
-			BSP_LCD_DisplayStringAt(20, 20, "                                        ", LEFT_MODE);
-			char* final_val_s = (char*)malloc(sizeof(char*)* 20);
-			sprintf(final_val_s, "%lf", final_val);
-			BSP_LCD_DisplayStringAt(20, 20, final_val_s, LEFT_MODE);
-			max_length = 20;
-			exp_length = 0;
-			expression = (uint8_t*) malloc(8 * max_length);
-			expression[0] = '\0';
-			BSP_LCD_DisplayStringAt(20, 20, expression, LEFT_MODE);
-			dout(debugmsg);
-		}
-		error=0;
-	}
+	free(debugmsg);
 }
+
+//void CalculatorProcess(void)
+//{
+//	char* debugmsg = (char*)malloc(sizeof(char)*100);
+//	// STEPIEN: Assume horizontal display
+//
+//	BSP_LCD_DisplayStringAt(279, 72, ")", LEFT_MODE);
+//	BSP_LCD_DisplayStringAt(279, 117, "*", LEFT_MODE);
+//	BSP_LCD_DisplayStringAt(279, 163, "+", LEFT_MODE);
+//	BSP_LCD_DisplayStringAt(279, 205, "=", LEFT_MODE);
+//
+//	uint16_t max_length = 20;
+//	uint16_t exp_length = 0;
+//	uint8_t* expression = (uint8_t*) malloc(8 * max_length);
+//	static uint8_t bounceUp = 0;
+//	static uint8_t bounceDown = 0;
+//	while (1){
+//		sprintf(debugmsg, "new expression\n");
+//		dout(debugmsg);
+//		uint8_t pressed = 0;
+//		while (1){
+//			// getDisplayPoint(&display, Read_Ads7846(), &matrix );
+//			uint8_t last_char = ' ';
+//			if (BSP_TP_GetDisplayPoint(&display) == 0 && pressed == 0){
+//				bounceDown++;
+//				if (bounceDown == 35){
+//					pressed = 1;
+//					bounceDown = 0;
+//					for (int i = 0; i < NUM_OF_BUTTONS; i++){
+//						if (rect_collision(buttons[i].border, display.x, display.y)){
+//							sprintf(debugmsg, "button pressed at: %d %d : %c\n", display.x, display.y, buttons[i].command);
+//							dout(debugmsg);
+//							expression[exp_length] = buttons[i].command;
+//							expression[exp_length+1] = '\0';
+//							sprintf(debugmsg, "expression: %s\n", expression);
+//							BSP_LCD_DisplayStringAt(20, 20, "                                        ", LEFT_MODE);
+//							BSP_LCD_DisplayStringAt(20, 20, expression, LEFT_MODE);
+//							dout(debugmsg);
+//							last_char = expression[exp_length];
+//							exp_length++;
+//						}
+//					}
+//				}
+//			}
+//			else if (BSP_TP_GetDisplayPoint(&display) == 1 && pressed == 1){
+//				bounceUp++;
+//				if (bounceUp == 35){
+//					bounceUp = 0;
+//					pressed = 0;
+//				}
+//			}
+//			if (exp_length + 2 > max_length){
+//				sprintf(debugmsg, "doubling expression length");
+//				dout(debugmsg);
+//				max_length *= 2;
+//				expression = (uint8_t*) realloc(expression, 8 * max_length);
+//			}
+//			if (last_char == 'c'){
+//				sprintf(debugmsg, "clearing expression");
+//				dout(debugmsg);
+//				max_length = 20;
+//				exp_length = 0;
+//				expression = (uint8_t*) malloc(8 * max_length);
+//				expression[0] = '\0';
+//				BSP_LCD_DisplayStringAt(20, 20, "                                        ", LEFT_MODE);
+//			}
+//			else if (last_char == '='){
+//				sprintf(debugmsg, "equals sign found!!!");
+//				dout(debugmsg);
+//				expression[exp_length+1] = '\0';
+//				sprintf(debugmsg, "loop broken\nexpression: %s\n", expression);
+//				dout(debugmsg);
+//				int arg_count = 0;
+//				uint8_t* exp_args = parse_expression(exp_length-1, expression, &arg_count);
+//				double final_val = eval_expression(arg_count, exp_args).symnum;
+//				sprintf(debugmsg, "%lf", final_val);
+//
+//				if (error!=0 || final_val != final_val){
+//					sprintf(debugmsg, "Invalid Input");
+//					dout(debugmsg);
+//					BSP_LCD_DisplayStringAt(20, 20, "Invalid Input", LEFT_MODE);
+//					max_length = 20;
+//					exp_length = 0;
+//					expression = (uint8_t*) malloc(8 * max_length);
+//					expression[0] = '\0';
+//				}
+//				else{
+//					BSP_LCD_DisplayStringAt(20, 20, "                                        ", LEFT_MODE);
+//					char* final_val_s = (char*)malloc(sizeof(char*)* 20);
+//					sprintf(final_val_s, "%lf", final_val);
+//					BSP_LCD_DisplayStringAt(20, 20, final_val_s, LEFT_MODE);
+//					max_length = 20;
+//					exp_length = 0;
+//					expression = (uint8_t*) malloc(8 * max_length);
+//					expression[0] = '\0';
+//					BSP_LCD_DisplayStringAt(20, 20, expression, LEFT_MODE);
+//					dout(debugmsg);
+//				}
+//				error=0;
+//			}
+//		}
+//		sprintf(debugmsg, "loop broken\nexpression: %s\n", expression);
+//		dout(debugmsg);
+//		int arg_count = 0;
+//		uint8_t* exp_args = parse_expression(exp_length-1, expression, &arg_count);
+//		double final_val = eval_expression(arg_count, exp_args).symnum;
+//		sprintf(debugmsg, "%lf", final_val);
+//		dout(debugmsg);
+//	}
+//}

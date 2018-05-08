@@ -1,8 +1,4 @@
-//     $Date: 2018-03-26 08:32:18 +1100 (Mon, 26 Mar 2018) $
-// $Revision: 1217 $
-//   $Author: Peter $
 #include "Q1.h"
-#include "Ass-02.h"
 #ifdef STM32F407xx
 #include "usart.h"
 #endif
@@ -13,8 +9,17 @@
 // REPLACE THE EXAMPLE CODE WITH YOUR CODE
 //
 
-int debug = 0;
+uint8_t* string;
 
+#ifndef MESTRUCT
+#define MESTRUCT
+typedef struct {
+	uint8_t* name;
+	uint8_t length;
+	uint8_t (*Function_p)(uint8_t argc, uint8_t* argv);
+	uint8_t* help;
+} command;
+#endif
 
 int string_parser(uint8_t *inp, uint8_t **array_of_words_p[]){
 
@@ -103,10 +108,13 @@ int string_parser(uint8_t *inp, uint8_t **array_of_words_p[]){
 }
 
 int validate_args(int args_count, uint8_t** args){
-//	printf("Entered args validator\n");
+	char* debugmsg = (char*)malloc(sizeof(char)*100);
+	sprintf(debugmsg, "Entered args validator\n");
+	dout(debugmsg);
 	for (int i = 1; i < args_count; i++){
 		int zerocount = 0;
-//		printf("checking arg %d: %f\n", i, atof(args[i]));
+		sprintf(debugmsg, "checking arg %d: %f\n", i, atof(args[i]));
+		dout(debugmsg);
 		if (atof(args[i]) == 0){
 			int wordlength = 0;
 			int pointcount = 0;
@@ -119,12 +127,15 @@ int validate_args(int args_count, uint8_t** args){
 				}
 			}
 			if (wordlength != zerocount+pointcount){
-//				printf("wordlength: %d zeros: %d points: %d\n", wordlength, zerocount, pointcount);
+				sprintf(debugmsg, "wordlength: %d zeros: %d points: %d\n", wordlength, zerocount, pointcount);
+				dout(debugmsg);
 				printf("Invalid number: '%s' is non a number\n", args[i]);
+				free(debugmsg);
 				return 0;
 			}
 		}
 	}
+	free(debugmsg);
 	return 1;
 }
 
@@ -189,15 +200,22 @@ void div_numbers(int args_count, uint8_t** args){
 	}
 }
 
-void debug_function(){
-	debug = (debug+1)%2;
-	if (debugtoggle == 0){
-		debugtoggle = 1;
-		printf("debug toggled off");
+void debug_function(uint8_t argc, uint8_t** args){
+	if (argc == 2){
+		if (str_compare(3, "on", args[1]) == 0){
+			debugtoggle = 1;
+			printf("debug toggled on\n");
+		}
+		else if (str_compare(4, "off", args[1]) == 0){
+			debugtoggle = 0;
+			printf("debug toggled off\n");
+		}
+		else {
+			printf("invalid debug command: %s\n", args[1]);
+		}
 	}
 	else {
-		debugtoggle = 0;
-		printf("debug toggled off");
+		printf("too many arguments for debug, expected 2, got: %d\n", argc);
 	}
 }
 
@@ -207,18 +225,9 @@ void CommandLineParserInit(void)
 	printf("\014");
 	printf("ELEC3730 Assignment 2\n");
 	printf("Command Line Parser Example\n");
+	string = (uint8_t*)malloc(sizeof(uint8_t)*20);
 }
 
-#ifndef MECOMMANDLIST
-#define MECOMMANDLIST
-const command commandlist[] = {
-		{ "add", 4, &add_numbers, "add <num1> .. <numN> : Prints the sum of the numbers\n" },
-		{ "sub", 4, &sub_numbers, "sub <num1> <num2> : Prints the result of num1-num2\n" },
-		{ "mul", 4, &mul_numbers, "mul <num1> .. <numN> : Prints the product of the numbers\n" },
-		{ "div", 4, &div_numbers, "div <num1> <num2> : Prints the result of num_1 / num_2\n" },
-		{ NULL, NULL, NULL, NULL }
-};
-#endif
 const command commandlist[] = {
 	{ "add", 4, &add_numbers, "add <num1> .. <numN> : Prints the sum of the numbers\n" },
 	{ "sub", 4, &sub_numbers, "sub <num1> <num2> : Prints the result of num1-num2\n" },
@@ -228,7 +237,6 @@ const command commandlist[] = {
 };
 
 void help_function(uint8_t argc, uint8_t** args){
-	printf("help required you are seeking help\n");
 	if (argc == 1){
 		for (int i = 0; i < COMMAND_COUNT; i++){
 			printf("%s", commandlist[i].help);
@@ -260,32 +268,67 @@ void help_function(uint8_t argc, uint8_t** args){
 
 void CommandLineParserProcess(void)
 {
+	char* debugmsg = (char*)malloc(sizeof(char)*100);
 	uint8_t c;
-
+	static uint8_t pos = 0;
+	static uint8_t length = 20;
 	// Check for input and echo back
 #ifdef STM32F407xx
 	if (HAL_UART_Receive(&huart2, &c, 1, 0x0) == HAL_OK){
-		printf("SERIAL: Got '%c'\n", c);
-		HAL_GPIO_TogglePin(GPIOD, LD4_Pin); // Toggle LED4
-
-		// STEPIEN: The following is some test code that can be removed
-		//
-		{
-			int c;
-			char si[]="1234";
-			int i=111;
-			char sf[]="r5b6c7d8";
-			float f=2.22;
-
-			printf("TEST: Float printf() test: %f\n", 1.234);
-			sscanf(si, "%d", &i);
-			c=sscanf(sf, "%f", &f);
-			printf("TEST: Input string : '%s'\n", si);
-			printf("TEST: Input int    : %d\n", i);
-			printf("TEST: Input string : '%s'\n", sf);
-			printf("TEST: Input float  : %f\n", f);
-			printf("TEST: c=%d\n",c);
+		sprintf(debugmsg, "SERIAL: Got '%c'\n", c);
+		dout(debugmsg);
+//		HAL_GPIO_TogglePin(GPIOD, LD4_Pin); // Toggle LED4
+		string[pos] = c;
+		pos++;
+		printf("%c", c);
+		if (pos == length){
+			sprintf(debugmsg, "console length doubled");
+			dout(debugmsg);
+			length *= 2;
+			string = (uint8_t*)realloc(string, sizeof(uint8_t)*length);
 		}
+		string[pos+1] = '\0';
+		sprintf(debugmsg, "current string %s", string);
+		dout(debugmsg);
+	}
+	if (c == '\n' || c == '\r'){	// if enter was pressed
+		sprintf(debugmsg, "enter pressed");
+		dout(debugmsg);
+		c = '\0';			// prevents infinite loop
+		string[pos-1] = c;
+		uint8_t **args;
+		int wordcount = string_parser(string, &args);		// parse string into arguements
+		for (int i = 0; i < wordcount; i++){
+			printf("word %d: %s.\n", i, args[i]);
+		}
+
+		int argFound = 0;
+		for (int i = 0; i < COMMAND_COUNT && argFound == 0; i++){
+			if (str_compare(commandlist[i].length, commandlist[i].name, args[0]) == 0){
+				argFound = 1;
+				if (validate_args(wordcount, args) == 1){
+					commandlist[i].Function_p(wordcount, args);
+				}
+				else{
+					printf("NAN");
+				}
+			}
+		}
+		if (argFound == 0){
+			if (str_compare(5, "help", args[0]) == 0){
+				help_function(wordcount, args);
+			}
+			else if (str_compare(6, "debug", args[0]) == 0){
+				debug_function(wordcount, args);
+			}
+			else{
+				printf("Unknown command: %s\n", args[0]);
+			}
+		}
+		length = 20;
+		pos = 0;
+		string = (uint8_t*)malloc(sizeof(uint8_t)*length);
+		free(args);
 	}
 #else
 	int length = 20;
@@ -339,4 +382,6 @@ void CommandLineParserProcess(void)
 	}
 
 #endif
+
+	free(debugmsg);
 }

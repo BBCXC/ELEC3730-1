@@ -7,41 +7,33 @@
 
 #ifndef Q1_H_
 #define Q1_H_
-
-void buildInputString(uint8_t c);
-int string_parser(char *inp, char **array_of_words_p[]);
-void analyseKeywords(uint8_t argNum, char* argStrings[]);
-
+#include "Ass-02.h"
 //uint8_t checkForNumericArgument(uint8_t processingIntegerFlag);
 //uint8_t checkArgumentLength(uint8_t flag, uint8_t expectedWordCount);
 
-uint8_t checkForNumericArgument2(uint8_t processingIntegerFlag, uint8_t argNum, char* argStrings[]);
-uint8_t checkArgumentLength2(uint8_t flag, uint8_t expectedWordCount, uint8_t argNum);
-
-float validateAddition(uint8_t argNum, char* argStrings[]);
-float addNumbers(uint8_t argNum, char* argStrings[]);
-float validateSubtraction(uint8_t argNum, char* argStrings[]);
-float subNumbers(uint8_t argNum, char* argStrings[]);
-float validateMultiplication(uint8_t argNum, char* argStrings[]);
-float mulNumbers(uint8_t argNum, char* argStrings[]);
-float validateDivision(uint8_t argNum, char* argStrings[]);
-float divNumbers(uint8_t argNum, char* argStrings[]);
-
-void debugMode(uint8_t argNum, char* argStrings[]);
-void helpDesk(uint8_t argNum, char* argStrings[]);
-
-float validateAndRunRoot(uint8_t flag, uint8_t argNum, char* argStrings[]);
-float validateSquareRoot(uint8_t argNum, char* argStrings[]);
-float validateCubeRoot(uint8_t argNum, char* argStrings[]);
-float squareRoot(char* argStrings[]);
-float cubeRoot(char* argStrings[]);
-float validatePower(uint8_t argNum, char* argStrings[]);
-float power(char* argStrings[]);
-float validateModulo(uint8_t argNum, char* argStrings[]);
-int modulo(char* argStrings[]);
+int debugtoggle;
 
 #ifndef MESTRUCT
 #define MESTRUCT
+typedef struct{
+	uint8_t x;
+	uint8_t y;
+	uint8_t w;
+	uint8_t h;
+} Rectangle;
+
+typedef struct{
+	uint8_t* symbol;
+	uint8_t command;
+	Rectangle border;
+	Rectangle text;
+} Button;
+
+typedef struct{
+	double symnum;
+	int is_symbol;
+} Symnum;
+
 typedef struct {
 	uint8_t* name;
 	uint8_t length;
@@ -50,8 +42,22 @@ typedef struct {
 } command;
 #endif
 
-const command commandList[5]; //todo alter later?
-uint8_t debugtoggle = 0;
+void dout(const char* str);
+int string_parser(uint8_t *inp, uint8_t **array_of_words_p[]);
+int validate_args(int args_count, uint8_t** args);
+int str_compare(uint8_t strLength, uint8_t* str1, uint8_t* str2);
+void add_numbers(int args_count, uint8_t** args);
+void sub_numbers(int args_count, uint8_t** args);
+void mul_numbers(int args_count, uint8_t** args);
+void div_numbers(int args_count, uint8_t** args);
+void debug_function(uint8_t argc, uint8_t** args);
+void help_function(uint8_t argc, uint8_t** args);
 
+uint8_t rect_collision(Rectangle r, uint16_t x, uint16_t y);
+void draw_button(Button b);
+Symnum* parse_expression(uint8_t exp_length, uint8_t* exp, int* argcout);
+Symnum eval_expression(uint8_t argc, Symnum* args);
+
+const command commandList[5]; //todo alter later?
 
 #endif /* Q1_H_ */
